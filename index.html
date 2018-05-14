@@ -1,5 +1,45 @@
-hello
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu+Condensed" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./default.css">
+    <title>pieni - the rapid prototyping</title>
+  </head>
+  <body>
+    <div class="container">
+      <div id="logo"></div>
+      <h1>pieni</h1>
+      <h2>the rapid prototyping</h2>
 
-# hello
+      <h3>Try demo now</h3>
+      <div id="sandbox">
+        <a target="_blank" href="http://pieni.princia.net" class="btn btn-lg btn-block btn-outline-primary">Make your own sandbox<br>(Valid for 8 hours)</a>
+      </div>
 
-<h1>Hello</h1>
+      <h3>Requirement</h3>
+      Apache 2.4.x / MySQL 5.7.x / PHP 7.0.x
+
+      <h3>Install</h3>
+        <pre>
+composer require pieni/tutorial
+mysql -uroot < vendor/pieni/tutorial/misc/pieni_tuttorial.dump
+cp vendor/pieni/tutorial/index.php .
+cp vendor/pieni/pieni/.htaccess .
+cp vendor/pieni/pieni/.gitignore .
+</pre>
+
+      <h3>License</h3>
+      MIT License
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted"><strong>pieni</strong> is developed by <a target="_blank" href="http://sagittar.org">Sagittarius Systems</a></span>
+      </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>$.ajax({url:'./logo.html',success:function(data){$('#logo').html(data);}});</script>
+  </body>
+</html>
