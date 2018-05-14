@@ -1,0 +1,99 @@
+<style>
+.st2{
+  stroke:#00000020;
+  animation: an2 2s;
+  fill:none;
+  opacity:0;
+}
+.st0{
+  stroke:#00000080;
+  stroke-dasharray: 400;
+  animation: an0 2s;
+  fill:none;
+  opacity:0;
+}
+.st1{
+  animation: an1 2s;
+  opacity:1;
+}
+@-webkit-keyframes an2 {
+  0% {
+    opacity:1;
+  }
+  75% {
+    opacity:1;
+  }
+}
+@-webkit-keyframes an0 {
+  0% {
+    opacity:1;
+    stroke-dashoffset: 400;
+  }
+  75% {
+    opacity:1;
+    stroke-dashoffset: 0;
+  }
+}
+@-webkit-keyframes an1 {
+  0% {
+    opacity:0;
+  }
+  50% {
+    opacity:0;
+  }
+}
+svg {
+	margin-bottom: -10px;
+}
+</style>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="140px" height="140px">
+	<defs>
+		<linearGradient id="g" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="#800000" />
+			<stop offset="1" stop-color="#FF0000" />
+		</linearGradient>
+	</defs>
+	<path class="st2" d="
+		M10,0 v140
+		M30,0 v140
+		M50,0 v140
+		M70,0 v140
+		M90,0 v140
+		M110,0 v140
+		M130,0 v140
+		M0,10 h140
+		M0,30 h140
+		M0,50 h140
+		M0,70 h140
+		M0,90 h140
+		M0,110 h140
+		M0,130 h140
+	" />
+	<path class="st0" d="
+		M10,40
+		a30,30,0,0,1,60,0
+		v70
+		l-40,20
+		v-90
+		a10,10,0,0,0,-20,0
+		M50,50
+		a40,40,0,1,1,80,0
+		a40,40,0,1,1,-80,0
+		a20,20,0,1,0,40,0
+		a20,20,0,1,0,-40,0
+	" />
+	<path class="st1" d="
+		M10,40
+		a30,30,0,0,1,60,0
+		v70
+		l-40,20
+		v-90
+		a10,10,0,0,0,-20,0
+		M50,50
+		a40,40,0,1,1,80,0
+		a40,40,0,1,1,-80,0
+		a20,20,0,1,0,40,0
+		a20,20,0,1,0,-40,0
+	" fill="url(#g)" />
+</svg>
