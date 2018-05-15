@@ -9,18 +9,18 @@
     <title>pieni - the rapid prototyping</title>
   </head>
   <body>
-    <div class="container">
-      <div id="logo"></div>
+    <div class="container mt-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="120px" height="120px"><defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#800000" /><stop offset="1" stop-color="#FF0000" /></linearGradient></defs><path d="M0,30a30,30,0,0,1,60,0v70l-40,20v-90a10,10,0,0,0,-20,0M40,40a40,40,0,1,1,80,0a40,40,0,1,1,-80,0a20,20,0,1,0,40,0a20,20,0,1,0,-40,0" fill="url(#g)" /></svg>
       <h1>pieni</h1>
       <h2>the rapid prototyping</h2>
 
-      <h3>Try demo now</h3>
-      <div id="sandbox">
-        <a target="_blank" href="http://pieni.princia.net" class="btn btn-lg btn-block btn-outline-primary">Make your own sandbox<br>(Valid for 8 hours)</a>
-      </div>
+      <p><a target="_blank" href="http://pieni.princia.net" class="btn btn-lg btn-block btn-primary">TRY DEMO NOW!</a></p>
 
       <h3>Requirement</h3>
-      Apache 2.4.x / MySQL 5.7.x / PHP 7.0.x
+      <p>Apache 2.4.x / MySQL 5.7.x / PHP 7.0.x</p>
+
+      <h3>License</h3>
+      <p>MIT License</p>
 
       <h3>Install</h3>
         <pre>
@@ -31,15 +31,9 @@ cp vendor/pieni/pieni/.htaccess .
 cp vendor/pieni/pieni/.gitignore .
 </pre>
 
-      <h3>License</h3>
-      MIT License
+      <h3>Documents</h3>
+      <p><a target="_blank" href="https://github.com/kentasaito/test/wiki">https://github.com/kentasaito/test/wiki</a></p>
+
     </div>
-    <footer class="footer">
-      <div class="container">
-        <span class="text-muted"><strong>pieni</strong> is developed by <a target="_blank" href="http://sagittar.org">Sagittarius Systems</a></span>
-      </div>
-    </footer>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script>$.ajax({url:'./logo.html',success:function(data){$('#logo').html(data);}});</script>
   </body>
 </html>
