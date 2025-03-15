@@ -10,9 +10,28 @@ type NumTags = {
   close: number;
 };
 
+const voidElements = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+];
+const voidElementRegExp = new RegExp(`<(${voidElements.join("|")})[^>]*>`, "g");
+//const voidElementCloseRegExp = new RegExp(`</(${voidElements.join("|")})>`, "g");
+
 export class Indentdown {
   static #getNumTags(line: string): NumTags {
-    const value = line.replace(/[^<\/>]/g, "");
+    const value = line.replace(voidElementRegExp, "").replace(/[^<\/>]/g, "");
     return {
       open: value.split("<>").length - 1,
       close: value.split("</>").length - 1,
@@ -51,17 +70,16 @@ export class Indentdown {
   }
 
   static #getTreeRecursive(lines: string[]): Node[] {
-    let htmlDepth: number = 0;
-    let nodeType: NodeType = null;
     const tree = [] as Node[];
     const buffer = [];
+    let htmlDepth: number = 0;
+    let nodeType: NodeType = null;
     for (const line of lines) {
-      const lastNodeType = nodeType;
-
+      const lastNodeType: NodeType = nodeType;
       const numTags = this.#getNumTags(line);
       htmlDepth += numTags.open - numTags.close;
       if (line.match(/^ *$/)) {
-        if (lastNodeType === "text" as NodeType) {
+        if (lastNodeType === "text") {
           nodeType = null;
         }
       } else if (nodeType !== "html" && line.match(/^ {2}/)) {
@@ -74,7 +92,6 @@ export class Indentdown {
       } else {
         nodeType = "text";
       }
-
       this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
       console.log({ line });
       buffer.push(line);
