@@ -1,3 +1,4 @@
+// void要素とインライン要素
 type NodeType = null | "text" | "html" | "child";
 type Node = {
   nodeType: NodeType;
@@ -28,9 +29,9 @@ export class Indentdown {
       if (lastNodeType === "text") {
         this.nodeType = null;
       }
-    } else if (line.match(/^ {2}/)) {
+    } else if (this.nodeType !== "html" && line.match(/^ {2}/)) {
       this.nodeType = "child";
-    } else if (this.htmlDepth > 0 || numTags.open > 0 || numTags.close > 0) {
+    } else if (this.nodeType !== "child" && this.htmlDepth > 0 || numTags.open > 0 || numTags.close > 0) {
       this.nodeType = "html";
     } else {
       this.nodeType = "text";
@@ -88,17 +89,19 @@ export class Indentdown {
     return this.#getTreeRecursive(input.split("\n"));
   }
 
-  static #getHtmlRecursive(tree: Node[]): string[] {
+  static #getHtmlRecursive(tree: Node[], nodeDepth: number = 0): string[] {
     const lines: string[] = [];
     for (const key in tree) {
       const i = parseInt(key);
       const node = tree[i];
       if (node.nodeType === "child") {
         lines.push("<div>");
-        lines.push(...this.#getHtmlRecursive(node.children).map((line) => "  " + line));
+        lines.push(...this.#getHtmlRecursive(node.children, nodeDepth + 1).map((line) => "  " + line));
         lines.push("</div>");
       } else if (node.nodeType === "html") {
         lines.push(...node.value.split("\n"));
+      } else if (i < tree.length - 1 && tree[i + 1].nodeType === "child") {
+        lines.push(`<h${nodeDepth + 1}>${node.value}</h${nodeDepth + 1}>`);
       } else {
         lines.push("<p>");
         lines.push(...node.value.split("\n").map((line) => "  " + line + "<br>"));

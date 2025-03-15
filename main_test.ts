@@ -34,3 +34,16 @@ Deno.test(function getTree4() {
     { nodeType: "text", value: "a", children: [] },
   ]);
 });
+
+Deno.test(function getTree5() {
+  assertEquals(Indentdown.getTree("a\n  <pre>\n    b\n  </pre>"), [
+    { nodeType: "text", value: "a", children: [] },
+    {
+      nodeType: "child",
+      value: "",
+      children: [
+        { nodeType: "html", value: "<pre>\n  b\n</pre>", children: [] },
+      ],
+    },
+  ]);
+});
