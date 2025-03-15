@@ -15,7 +15,11 @@ Deno.test(function getTree2() {
       value: "",
       children: [
         { nodeType: "text", value: "b", children: [] },
-        { nodeType: "child", value: "", children: [{ nodeType: "text", value: "c", children: [] }] },
+        {
+          nodeType: "child",
+          value: "",
+          children: [{ nodeType: "text", value: "c", children: [] }],
+        },
       ],
     },
   ]);
@@ -49,12 +53,15 @@ Deno.test(function getTree5() {
 });
 
 Deno.test(function getHtml1() {
-  assertEquals(Indentdown.getHtml(Indentdown.getTree("a\n  <pre>\n    b\n  </pre>")), `<h1>a</h1>
+  assertEquals(
+    Indentdown.getHtml(Indentdown.getTree("a\n  <pre>\n    b\n  </pre>")),
+    `<h1>a</h1>
 <div>
 <pre>
 b
 </pre>
-</div>`);
+</div>`,
+  );
 });
 
 Deno.test(function getTree6() {

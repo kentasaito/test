@@ -31,7 +31,10 @@ export class Indentdown {
       }
     } else if (this.nodeType !== "html" && line.match(/^ {2}/)) {
       this.nodeType = "child";
-    } else if (this.nodeType !== "child" && this.htmlDepth > 0 || numTags.open > 0 || numTags.close > 0) {
+    } else if (
+      this.nodeType !== "child" && this.htmlDepth > 0 || numTags.open > 0 ||
+      numTags.close > 0
+    ) {
       this.nodeType = "html";
     } else {
       this.nodeType = "text";
@@ -94,7 +97,11 @@ export class Indentdown {
       const node = tree[i];
       if (node.nodeType === "child") {
         lines.push("<div>");
-        lines.push(...this.#getHtmlRecursive(node.children, nodeDepth + 1).map((line) => "  " + line));
+        lines.push(
+          ...this.#getHtmlRecursive(node.children, nodeDepth + 1).map((line) =>
+            "  " + line
+          ),
+        );
         lines.push("</div>");
       } else if (node.nodeType === "html") {
         lines.push(...node.value.split("\n"));
@@ -102,7 +109,9 @@ export class Indentdown {
         lines.push(`<h${nodeDepth + 1}>${node.value}</h${nodeDepth + 1}>`);
       } else {
         lines.push("<p>");
-        lines.push(...node.value.split("\n").map((line) => "  " + line + "<br>"));
+        lines.push(
+          ...node.value.split("\n").map((line) => "  " + line + "<br>"),
+        );
         lines.push("</p>");
       }
     }
