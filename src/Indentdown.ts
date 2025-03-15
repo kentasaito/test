@@ -44,7 +44,7 @@ export class Indentdown {
     lastNodeType: NodeType,
   ) {
     if (this.nodeType !== lastNodeType) {
-      console.log({ nodeType: this.nodeType });
+      console.log({ nodeType: this.nodeType, buffer });
       if (lastNodeType !== null) {
         if (buffer.length > 0) {
           tree.push(
@@ -72,12 +72,10 @@ export class Indentdown {
     const tree = [] as Node[];
     const buffer = [];
     for (const line of lines) {
-      console.log({ line });
       const lastNodeType = this.nodeType;
       this.#updateNodeType(line, lastNodeType);
       this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType);
       buffer.push(line);
-      console.log();
     }
     const lastNodeType = this.nodeType;
     this.nodeType = null;
