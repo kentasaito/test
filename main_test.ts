@@ -27,3 +27,10 @@ Deno.test(function getTree3() {
     { nodeType: "text", value: "a", children: [] },
   ]);
 });
+
+Deno.test(function getTree4() {
+  assertEquals(Indentdown.getTree("<p></p>\na"), [
+    { nodeType: "html", value: "<p></p>", children: [] },
+    { nodeType: "text", value: "a", children: [] },
+  ]);
+});

@@ -14,7 +14,7 @@ export class Indentdown {
   static htmlDepth: number = 0;
 
   static #getNumTags(line: string): NumTags {
-    const value = line.replace(/[^<\/>]/, "");
+    const value = line.replace(/[^<\/>]/g, "");
     return {
       open: value.split("<>").length - 1,
       close: value.split("</>").length - 1,
@@ -88,18 +88,28 @@ export class Indentdown {
     return this.#getTreeRecursive(input.split("\n"));
   }
 
-  static #getHtmlRecursive(tree: Node[]): string {
-    let html = "";
-    for (const node of tree) {
+  static #getHtmlRecursive(tree: Node[]): string[] {
+    const lines: string[] = [];
+    for (const key in tree) {
+      const i = parseInt(key);
+      const node = tree[i];
       if (node.nodeType === "child") {
-        html += this.#getHtmlRecursive(node.children);
+        lines.push("<div>");
+        lines.push(...this.#getHtmlRecursive(node.children).map((line) => "  " + line));
+        lines.push("</div>");
+      } else if (node.nodeType === "html") {
+        lines.push(...node.value.split("\n"));
+      } else {
+        lines.push("<p>");
+        lines.push(...node.value.split("\n").map((line) => "  " + line + "<br>"));
+        lines.push("</p>");
       }
     }
-    return html;
+    return lines;
   }
 
   static getHtml(tree: Node[]): string {
-    return this.#getHtmlRecursive(tree);
+    return this.#getHtmlRecursive(tree).join("\n");
   }
 }
 
@@ -112,5 +122,5 @@ if (import.meta.main) {
   const tree = Indentdown.getTree(input);
   console.log(tree);
   const html = Indentdown.getHtml(tree);
-  console.log({html});
+  console.log(html);
 }
