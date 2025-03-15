@@ -56,3 +56,17 @@ b
 </pre>
 </div>`);
 });
+
+Deno.test(function getTree6() {
+  assertEquals(Indentdown.getTree("a\n  b\nc"), [
+    { nodeType: "text", value: "a", children: [] },
+    {
+      nodeType: "child",
+      value: "",
+      children: [
+        { nodeType: "text", value: "b", children: [] },
+      ],
+    },
+    { nodeType: "text", value: "c", children: [] },
+  ]);
+});
