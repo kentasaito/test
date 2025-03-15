@@ -138,7 +138,7 @@ if (import.meta.main) {
     input += decoder.decode(chunk);
   }
   const tree = Indentdown.getTree(input);
-  console.log(tree);
+  console.log(JSON.stringify(tree, null, 2));
   const html = Indentdown.getHtml(tree);
   console.log(html);
 }
