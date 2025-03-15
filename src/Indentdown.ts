@@ -11,7 +11,7 @@ type NumTags = {
 };
 
 export class Indentdown {
- static htmlDepth: number = 0;
+  static htmlDepth: number = 0;
 
   static #getNumTags(line: string): NumTags {
     const value = line.replace(/[^<\/>]/g, "");
@@ -21,7 +21,9 @@ export class Indentdown {
     };
   }
 
-  static #getNodeType(line: string, lastNodeType: NodeType,
+  static #getNodeType(
+    line: string,
+    lastNodeType: NodeType,
     nodeType: NodeType,
   ): NodeType {
     const numTags = this.#getNumTags(line);
