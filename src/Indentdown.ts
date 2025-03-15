@@ -21,28 +21,6 @@ export class Indentdown {
     };
   }
 
-  static #getNodeType(
-    line: string,
-    lastNodeType: NodeType,
-    nodeType: NodeType,
-  ): NodeType {
-    const numTags = this.#getNumTags(line);
-    this.htmlDepth += numTags.open - numTags.close;
-    if (line.match(/^ *$/)) {
-      if (lastNodeType === "text") {
-        return null as NodeType;
-      }
-    } else if (nodeType !== "html" && line.match(/^ {2}/)) {
-      return "parent" as NodeType;
-    } else if (
-      nodeType !== "parent" && this.htmlDepth > 0 || numTags.open > 0 ||
-      numTags.close > 0
-    ) {
-      return "html" as NodeType;
-    }
-    return "text" as NodeType;
-  }
-
   static #flushNodeIfNodeTypeChanged(
     tree: Node[],
     buffer: string[],
@@ -80,7 +58,6 @@ export class Indentdown {
     const buffer = [];
     for (const line of lines) {
       const lastNodeType = nodeType;
-//      nodeType = this.#getNodeType(line, lastNodeType, nodeType);
 
       const numTags = this.#getNumTags(line);
       this.htmlDepth += numTags.open - numTags.close;
