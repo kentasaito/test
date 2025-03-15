@@ -22,32 +22,34 @@ export class Indentdown {
     };
   }
 
-  static #updateNodeType(line: string, lastNodeType: NodeType) {
+  static #getNodeType(line: string, lastNodeType: NodeType,
+    nodeType: NodeType,
+  ): NodeType {
     const numTags = this.#getNumTags(line);
     this.htmlDepth += numTags.open - numTags.close;
     if (line.match(/^ *$/)) {
       if (lastNodeType === "text") {
-        this.nodeType = null;
+        return null as NodeType;
       }
-    } else if (this.nodeType !== "html" && line.match(/^ {2}/)) {
-      this.nodeType = "parent";
+    } else if (nodeType !== "html" && line.match(/^ {2}/)) {
+      return "parent" as NodeType;
     } else if (
-      this.nodeType !== "parent" && this.htmlDepth > 0 || numTags.open > 0 ||
+      nodeType !== "parent" && this.htmlDepth > 0 || numTags.open > 0 ||
       numTags.close > 0
     ) {
-      this.nodeType = "html";
-    } else {
-      this.nodeType = "text";
+      return "html" as NodeType;
     }
+    return "text" as NodeType;
   }
 
   static #flushNodeIfNodeTypeChanged(
     tree: Node[],
     buffer: string[],
     lastNodeType: NodeType,
+    nodeType: NodeType,
   ) {
-    if (this.nodeType !== lastNodeType) {
-      console.log({ nodeType: this.nodeType, buffer });
+    if (nodeType !== lastNodeType) {
+      console.log({ nodeType, buffer });
       if (lastNodeType !== null) {
         if (buffer.length > 0) {
           tree.push(
@@ -72,18 +74,19 @@ export class Indentdown {
   }
 
   static #getTreeRecursive(lines: string[]): Node[] {
+    let nodeType: NodeType = null;
     const tree = [] as Node[];
     const buffer = [];
     for (const line of lines) {
-      const lastNodeType = this.nodeType;
-      this.#updateNodeType(line, lastNodeType);
-      this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType);
+      const lastNodeType = nodeType;
+      nodeType = this.#getNodeType(line, lastNodeType, nodeType);
+      this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
       console.log({ line });
       buffer.push(line);
     }
-    const lastNodeType = this.nodeType;
-    this.nodeType = null;
-    this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType);
+    const lastNodeType = nodeType;
+    nodeType = null;
+    this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
     return tree;
   }
 
