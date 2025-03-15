@@ -1,11 +1,14 @@
+/** ノードタイプ */
 type NodeType = null | "text" | "html" | "parent";
 
+/** ノード */
 type Node = {
   nodeType: NodeType;
   value: string;
   children: Node[];
 };
 
+/** タグの個数 */
 type NumTags = {
   open: number;
   close: number;
@@ -75,6 +78,8 @@ const inlineElementCloseRegExp = new RegExp(
 
 /** Indentdownクラス */
 export class Indentdown {
+
+  /** タグの個数を得る */
   static #getNumTags(line: string): NumTags {
     const value = line.replace(voidElementRegExp, "")
       .replace(inlineElementOpenRegExp, "")
@@ -86,6 +91,7 @@ export class Indentdown {
     };
   }
 
+  /** ノードタイプが変化したらノードをフラッシュする */
   static #flushNodeIfNodeTypeChanged(
     tree: Node[],
     buffer: string[],
@@ -116,6 +122,7 @@ export class Indentdown {
     }
   }
 
+  /** 再帰的に木構造を得る */
   static #getTreeRecursive(lines: string[]): Node[] {
     const tree = [] as Node[];
     const buffer = [];
@@ -153,6 +160,7 @@ export class Indentdown {
     return this.#getTreeRecursive(input.split("\n"));
   }
 
+  /** 再帰的にHTMLを得る */
   static #getHtmlRecursive(tree: Node[], nodeDepth: number = 0): string[] {
     const lines: string[] = [];
     for (const key in tree) {
