@@ -112,7 +112,22 @@ export class Indentdown {
   }
 
   static getHtml(tree: Node[]): string {
-    return this.#getHtmlRecursive(tree).join("\n");
+    const lines = this.#getHtmlRecursive(tree);
+    let unindent: number = 0;
+    for (const key in lines) {
+      const i = parseInt(key);
+      const matches = lines[i].match(/^((?: {2})*)<pre/);
+      if (matches) {
+        unindent = matches[1].length;
+      }
+      if (unindent > 0) {
+        lines[i] = lines[i].replace(new RegExp(`^ {0,${unindent + 2}}`), "");
+      }
+      if (lines[i].match(new RegExp(`^/ {${unindent}</pre}`))) {
+        unindent = 0;
+      }
+    }
+    return lines.join("\n");
   }
 }
 
