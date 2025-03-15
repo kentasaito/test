@@ -1,10 +1,11 @@
-// インライン要素
 type NodeType = null | "text" | "html" | "parent";
+
 type Node = {
   nodeType: NodeType;
   value: string;
   children: Node[];
 };
+
 type NumTags = {
   open: number;
   close: number;
@@ -26,8 +27,8 @@ const voidElements = [
   "track",
   "wbr",
 ];
+
 const voidElementRegExp = new RegExp(`<(${voidElements.join("|")})[^>]*>`, "g");
-//const voidElementCloseRegExp = new RegExp(`</(${voidElements.join("|")})>`, "g");
 
 const inlineElements = [
   "a",
@@ -61,16 +62,23 @@ const inlineElements = [
   "tt",
   "var",
 ];
-const inlineElementOpenRegExp = new RegExp(`<(${inlineElements.join("|")})[^>]*>`, "g");
-const inlineElementCloseRegExp = new RegExp(`</(${inlineElements.join("|")})>`, "g");
+
+const inlineElementOpenRegExp = new RegExp(
+  `<(${inlineElements.join("|")})[^>]*>`,
+  "g",
+);
+
+const inlineElementCloseRegExp = new RegExp(
+  `</(${inlineElements.join("|")})>`,
+  "g",
+);
 
 export class Indentdown {
   static #getNumTags(line: string): NumTags {
-    const value = line
-    .replace(voidElementRegExp, "")
-    .replace(inlineElementOpenRegExp, "")
-    .replace(inlineElementCloseRegExp, "")
-    .replace(/[^<\/>]/g, "");
+    const value = line.replace(voidElementRegExp, "")
+      .replace(inlineElementOpenRegExp, "")
+      .replace(inlineElementCloseRegExp, "")
+      .replace(/[^<\/>]/g, "");
     return {
       open: value.split("<>").length - 1,
       close: value.split("</>").length - 1,
