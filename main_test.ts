@@ -47,3 +47,12 @@ Deno.test(function getTree5() {
     },
   ]);
 });
+
+Deno.test(function getHtml1() {
+  assertEquals(Indentdown.getHtml(Indentdown.getTree("a\n  <pre>\n    b\n  </pre>")), `<h1>a</h1>
+<div>
+<pre>
+b
+</pre>
+</div>`);
+});
