@@ -1,8 +1,8 @@
 type NodeType = null | "text" | "html" | "child";
 type Node = {
   nodeType: NodeType;
-  value?: string;
-  children?: Node[];
+  value: string;
+  children: Node[];
 };
 type NumTags = {
   open: number;
@@ -50,6 +50,7 @@ export class Indentdown {
             lastNodeType === "child"
               ? {
                 nodeType: lastNodeType,
+                value: "",
                 children: this.#getTreeRecursive(
                   buffer.map((line) => line.replace(/^ {2}/, "")),
                 ),
@@ -57,6 +58,7 @@ export class Indentdown {
               : {
                 nodeType: lastNodeType,
                 value: buffer.join("\n").trim(),
+                children: [],
               } as Node,
           );
         }
@@ -85,6 +87,20 @@ export class Indentdown {
   static getTree(input: string): Node[] {
     return this.#getTreeRecursive(input.split("\n"));
   }
+
+  static #getHtmlRecursive(tree: Node[]): string {
+    let html = "";
+    for (const node of tree) {
+      if (node.nodeType === "child") {
+        html += this.#getHtmlRecursive(node.children);
+      }
+    }
+    return html;
+  }
+
+  static getHtml(tree: Node[]): string {
+    return this.#getHtmlRecursive(tree);
+  }
 }
 
 if (import.meta.main) {
@@ -93,5 +109,8 @@ if (import.meta.main) {
   for await (const chunk of Deno.stdin.readable) {
     input += decoder.decode(chunk);
   }
-  console.log(Indentdown.getTree(input));
+  const tree = Indentdown.getTree(input);
+  console.log(tree);
+  const html = Indentdown.getHtml(tree);
+  console.log({html});
 }
