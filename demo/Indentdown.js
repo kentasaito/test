@@ -12,7 +12,7 @@ const voidElements = [
   "param",
   "source",
   "track",
-  "wbr"
+  "wbr",
 ];
 const voidElementRegExp = new RegExp(`<(${voidElements.join("|")})[^>]*>`, "g");
 const inlineElements = [
@@ -45,22 +45,25 @@ const inlineElements = [
   "textarea",
   "time",
   "tt",
-  "var"
+  "var",
 ];
 const inlineElementOpenRegExp = new RegExp(
   `<(${inlineElements.join("|")})[^>]*>`,
-  "g"
+  "g",
 );
 const inlineElementCloseRegExp = new RegExp(
   `</(${inlineElements.join("|")})>`,
-  "g"
+  "g",
 );
 export class Indentdown {
   static #getNumTags(line) {
-    const value = line.replace(voidElementRegExp, "").replace(inlineElementOpenRegExp, "").replace(inlineElementCloseRegExp, "").replace(/[^<\/>]/g, "");
+    const value = line.replace(voidElementRegExp, "").replace(
+      inlineElementOpenRegExp,
+      "",
+    ).replace(inlineElementCloseRegExp, "").replace(/[^<\/>]/g, "");
     return {
       open: value.split("<>").length - 1,
-      close: value.split("</>").length - 1
+      close: value.split("</>").length - 1,
     };
   }
   static #flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType) {
@@ -68,17 +71,19 @@ export class Indentdown {
       if (lastNodeType !== null) {
         if (buffer.length > 0) {
           tree.push(
-            lastNodeType === "parent" ? {
-              nodeType: lastNodeType,
-              value: "",
-              children: this.#getTreeRecursive(
-                buffer.map((line) => line.replace(/^ {2}/, ""))
-              )
-            } : {
-              nodeType: lastNodeType,
-              value: buffer.join("\n").trim(),
-              children: []
-            }
+            lastNodeType === "parent"
+              ? {
+                nodeType: lastNodeType,
+                value: "",
+                children: this.#getTreeRecursive(
+                  buffer.map((line) => line.replace(/^ {2}/, "")),
+                ),
+              }
+              : {
+                nodeType: lastNodeType,
+                value: buffer.join("\n").trim(),
+                children: [],
+              },
           );
         }
       }
@@ -100,7 +105,10 @@ export class Indentdown {
         }
       } else if (nodeType !== "html" && line.match(/^ {2}/)) {
         nodeType = "parent";
-      } else if (nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 || numTags.close > 0) {
+      } else if (
+        nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 ||
+        numTags.close > 0
+      ) {
         nodeType = "html";
       } else {
         nodeType = "text";
@@ -125,8 +133,8 @@ export class Indentdown {
         lines.push("<div>");
         lines.push(
           ...this.#getHtmlRecursive(node.children, nodeDepth + 1).map(
-            (line) => "  " + line
-          )
+            (line) => "  " + line,
+          ),
         );
         lines.push("</div>");
       } else if (node.nodeType === "html") {
@@ -136,7 +144,7 @@ export class Indentdown {
       } else {
         lines.push("<p>");
         lines.push(
-          ...node.value.split("\n").map((line) => "  " + line + "<br>")
+          ...node.value.split("\n").map((line) => "  " + line + "<br>"),
         );
         lines.push("</p>");
       }
