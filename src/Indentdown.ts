@@ -1,5 +1,5 @@
 // void要素とインライン要素
-type NodeType = null | "text" | "html" | "child";
+type NodeType = null | "text" | "html" | "parent";
 type Node = {
   nodeType: NodeType;
   value: string;
@@ -30,9 +30,9 @@ export class Indentdown {
         this.nodeType = null;
       }
     } else if (this.nodeType !== "html" && line.match(/^ {2}/)) {
-      this.nodeType = "child";
+      this.nodeType = "parent";
     } else if (
-      this.nodeType !== "child" && this.htmlDepth > 0 || numTags.open > 0 ||
+      this.nodeType !== "parent" && this.htmlDepth > 0 || numTags.open > 0 ||
       numTags.close > 0
     ) {
       this.nodeType = "html";
@@ -51,7 +51,7 @@ export class Indentdown {
       if (lastNodeType !== null) {
         if (buffer.length > 0) {
           tree.push(
-            lastNodeType === "child"
+            lastNodeType === "parent"
               ? {
                 nodeType: lastNodeType,
                 value: "",
@@ -78,6 +78,7 @@ export class Indentdown {
       const lastNodeType = this.nodeType;
       this.#updateNodeType(line, lastNodeType);
       this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType);
+      console.log({ line });
       buffer.push(line);
     }
     const lastNodeType = this.nodeType;
@@ -95,7 +96,7 @@ export class Indentdown {
     for (const key in tree) {
       const i = parseInt(key);
       const node = tree[i];
-      if (node.nodeType === "child") {
+      if (node.nodeType === "parent") {
         lines.push("<div>");
         lines.push(
           ...this.#getHtmlRecursive(node.children, nodeDepth + 1).map((line) =>
@@ -105,7 +106,7 @@ export class Indentdown {
         lines.push("</div>");
       } else if (node.nodeType === "html") {
         lines.push(...node.value.split("\n"));
-      } else if (i < tree.length - 1 && tree[i + 1].nodeType === "child") {
+      } else if (i < tree.length - 1 && tree[i + 1].nodeType === "parent") {
         lines.push(`<h${nodeDepth + 1}>${node.value}</h${nodeDepth + 1}>`);
       } else {
         lines.push("<p>");
