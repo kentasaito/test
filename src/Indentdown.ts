@@ -123,7 +123,7 @@ export class Indentdown {
       if (unindent > 0) {
         lines[i] = lines[i].replace(new RegExp(`^ {0,${unindent + 2}}`), "");
       }
-      if (lines[i].match(new RegExp(`^/ {${unindent}</pre}`))) {
+      if (lines[i].match(/<\/pre/)) {
         unindent = 0;
       }
     }
