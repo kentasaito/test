@@ -1,153 +1,177 @@
+const voidElements = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr"
+];
+const voidElementRegExp = new RegExp(`<(${voidElements.join("|")})[^>]*>`, "g");
+const inlineElements = [
+  "a",
+  "abbr",
+  "acronym",
+  "b",
+  "bdo",
+  "big",
+  "button",
+  "cite",
+  "code",
+  "dfn",
+  "em",
+  "i",
+  "kbd",
+  "label",
+  "map",
+  "object",
+  "output",
+  "q",
+  "samp",
+  "script",
+  "select",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "textarea",
+  "time",
+  "tt",
+  "var"
+];
+const inlineElementOpenRegExp = new RegExp(
+  `<(${inlineElements.join("|")})[^>]*>`,
+  "g"
+);
+const inlineElementCloseRegExp = new RegExp(
+  `</(${inlineElements.join("|")})>`,
+  "g"
+);
 export class Indentdown {
-  static #parser = new DOMParser();
-
-  // ノードの深さを得る
-  static #getNodeDepth(line) {
-    return Math.floor(line.replace(/^( *).*?$/, '$1').length / 2);
+  static #getNumTags(line) {
+    const value = line.replace(voidElementRegExp, "").replace(inlineElementOpenRegExp, "").replace(inlineElementCloseRegExp, "").replace(/[^<\/>]/g, "");
+    return {
+      open: value.split("<>").length - 1,
+      close: value.split("</>").length - 1
+    };
   }
-
-  // 子要素の数を得る
-  static #getChildElementCount(str) {
-    return this.#parser.parseFromString(str, 'text/html').body.childElementCount;
-  }
-
-  // 閉じた HTML か
-  static #isClosedHtml(str) {
-    return str.replace(/\s/g, "") === this.#parser.parseFromString(str, 'text/html').body.firstElementChild?.outerHTML.replace(/\s/g, "");
-  }
-
-  ////////
-
-  // 子ノードの始まりか
-  static #isBeginningOfChildNode(nodeType, line) {
-    return nodeType === "current" && this.#getNodeDepth(line) > 0;
-  }
-
-  // 子ノードの終わりか
-  static #isEndOfChildNode(nodeType, line) {
-    return nodeType === "child" && this.#getNodeDepth(line) === 0 && line !== "";
-  }
-
-  // HTML ノードの始まりか
-  static #isBeginningOfHtmlNode(nodeType, line) {
-    return nodeType === "current" && this.#getChildElementCount(line) > 0;
-  }
-
-  // HTML ノードの終わりか
-  static #isEndOfHtmlNode(nodeType, buffer) {
-    return nodeType === "html" && this.#isClosedHtml(buffer.join("\n"));
-  }
-
-  ////////
-
-  // バッファをフラッシュする
-  static #flushBuffer(buffer) {
-    const node = [];
-    if (buffer.length) {
-      node.push(buffer.join("\n"));
+  static #flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType) {
+    if (nodeType !== lastNodeType) {
+      console.log({ nodeType, buffer });
+      if (lastNodeType !== null) {
+        if (buffer.length > 0) {
+          tree.push(
+            lastNodeType === "parent" ? {
+              nodeType: lastNodeType,
+              value: "",
+              children: this.#getTreeRecursive(
+                buffer.map((line) => line.replace(/^ {2}/, ""))
+              )
+            } : {
+              nodeType: lastNodeType,
+              value: buffer.join("\n").trim(),
+              children: []
+            }
+          );
+        }
+      }
       buffer.length = 0;
     }
-    return node;
   }
-
-  ////////
-
-  // 再帰的に木を得る
   static #getTreeRecursive(lines) {
     const tree = [];
     const buffer = [];
-    let nodeType = "current";
-    // 入力された全ての行に対して
+    let htmlDepth = 0;
+    let nodeType = null;
     for (const line of lines) {
-      // 子ノードの始まりなら、バッファをフラッシュ、子ノードへ
-      if (this.#isBeginningOfChildNode(nodeType, line)) {
-        tree.push(...this.#flushBuffer(buffer));
-        nodeType = "child";
-      }
-      // HTML ノードの始まりなら、バッファをフラッシュ、HTML ノードへ
-      if (this.#isBeginningOfHtmlNode(nodeType, line)) {
-        tree.push(...this.#flushBuffer(buffer));
+      const lastNodeType2 = nodeType;
+      const numTags = this.#getNumTags(line);
+      htmlDepth += numTags.open - numTags.close;
+      if (line.match(/^ *$/)) {
+        if (lastNodeType2 === "text") {
+          nodeType = null;
+        }
+      } else if (nodeType !== "html" && line.match(/^ {2}/)) {
+        nodeType = "parent";
+      } else if (nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 || numTags.close > 0) {
         nodeType = "html";
-      }
-
-      // 子ノードの終わりなら、再帰的に木を取得、バッファをクリア、現在ノードへ
-      if (this.#isEndOfChildNode(nodeType, line)) {
-        tree.push(this.#getTreeRecursive([...buffer].map((line) => line.replace(/^ {2}/, ""))));
-        buffer.length = 0;
-        nodeType = "current";
-      }
-
-      // 現在ノードかつ空行なら
-      if (nodeType === "current" && line.match(/^ *$/)) {
-        // バッファをフラッシュ
-        tree.push(...this.#flushBuffer(buffer));
       } else {
-        // バッファに行をプッシュ
-        buffer.push(line);
+        nodeType = "text";
       }
-
-      // HTML ノードの終わりなら、バッファをフラッシュ、現在ノードへ
-      if (this.#isEndOfHtmlNode(nodeType, buffer)) {
-        tree.push(...this.#flushBuffer(buffer));
-        nodeType = "current";
-      }
+      this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType2, nodeType);
+      console.log({ line });
+      buffer.push(line);
     }
-
-    // 残ったバッファを処理
-    if (nodeType === "child") {
-      tree.push(this.#getTreeRecursive([...buffer].map((line) => line.replace(/^ {2}/, ""))));
-      buffer.length = 0;
-    } else {
-      tree.push(...this.#flushBuffer(buffer));
-    }
+    const lastNodeType = nodeType;
+    nodeType = null;
+    this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
     return tree;
   }
-
-  ////////
-
-  // 木を得る
   static getTree(input) {
-    return this.#getTreeRecursive(input.split("\n")); 
+    return this.#getTreeRecursive(input.split("\n"));
   }
-
-  ////////
-
-  // 再帰的に HTML を得る
-  static #getHtmlRecursive(tree, depth = 0) {
-    let html = "";
+  static #getHtmlRecursive(tree, nodeDepth = 0) {
+    const lines = [];
     for (const key in tree) {
       const i = parseInt(key);
       const node = tree[i];
-      if (Array.isArray(node)) {
-        html += "<div>\n" + this.#getHtmlRecursive(node, depth + 1).trim().split("\n").map((line) => `  ${line}`).join("\n") + "\n</div>";
+      if (node.nodeType === "parent") {
+        lines.push("<div>");
+        lines.push(
+          ...this.#getHtmlRecursive(node.children, nodeDepth + 1).map(
+            (line) => "  " + line
+          )
+        );
+        lines.push("</div>");
+      } else if (node.nodeType === "html") {
+        lines.push(...node.value.split("\n"));
+      } else if (i < tree.length - 1 && tree[i + 1].nodeType === "parent") {
+        lines.push(`<h${nodeDepth + 1}>${node.value}</h${nodeDepth + 1}>`);
       } else {
-        if (this.#isClosedHtml(node)) {
-          html += node;
-        } else {
-          if (i < tree.length - 1 && Array.isArray(tree[i + 1])) {
-            html += `<h${depth + 1}>${node}</h${depth + 1}>\n`;
-          } else {
-            html += "<p>\n" + node.split("\n").map((line) => `  ${line}<br>`).join("\n") + "\n</p>\n";
-          }
-        }
+        lines.push("<p>");
+        lines.push(
+          ...node.value.split("\n").map((line) => "  " + line + "<br>")
+        );
+        lines.push("</p>");
       }
     }
-    return html;
+    return lines;
   }
-
-  // HTML を得る
-  static getHtml(tree, depth = 0) {
-    let indent = 0;
-    html = "";
-    for (const line of this.#getHtmlRecursive(tree).split("\n")) {
-      if (line.match(/^ *<pre>$/)) {
-        indent = line.replace(/^( *).*?$/, "$1").length + 2;
+  static getHtml(tree) {
+    const lines = this.#getHtmlRecursive(tree);
+    let unindent = 0;
+    for (const key in lines) {
+      const i = parseInt(key);
+      const matches = lines[i].match(/^((?: {2})*)<pre/);
+      if (matches) {
+        unindent = matches[1].length;
       }
-      html += line.replace(new RegExp(`^ {0,${indent}}`), "") + "\n";
-      if (line.match(/^ *<\/pre>$/)) {
-        indent = 0;
+      if (unindent > 0) {
+        lines[i] = lines[i].replace(new RegExp(`^ {0,${unindent + 2}}`), "");
+      }
+      if (lines[i].match(/<\/pre/)) {
+        unindent = 0;
       }
     }
-    return html;
+    return lines.join("\n");
   }
+}
+if (import.meta.main) {
+  let input = "";
+  const decoder = new TextDecoder();
+  for await (const chunk of Deno.stdin.readable) {
+    input += decoder.decode(chunk);
+  }
+  const tree = Indentdown.getTree(input);
+  console.log(JSON.stringify(tree, null, 2));
+  const html = Indentdown.getHtml(tree);
+  console.log(html);
 }

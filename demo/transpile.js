@@ -1,8 +1,7 @@
 import * as esbuild from "npm:esbuild@0.20.2";
 
 const result = await esbuild.build({
-  plugins: [...denoPlugins()],
-  entryPoints: ["../Indentdown.ts"],
+  entryPoints: ["../src/Indentdown.ts"],
   outfile: "./Indentdown.js",
 //  bundle: true,
 //  format: "esm",
