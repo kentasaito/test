@@ -73,6 +73,7 @@ const inlineElementCloseRegExp = new RegExp(
   "g",
 );
 
+/** Indentdownクラス */
 export class Indentdown {
   static #getNumTags(line: string): NumTags {
     const value = line.replace(voidElementRegExp, "")
@@ -147,6 +148,7 @@ export class Indentdown {
     return tree;
   }
 
+  /** テキストから木構造を得る */
   static getTree(input: string): Node[] {
     return this.#getTreeRecursive(input.split("\n"));
   }
@@ -179,6 +181,7 @@ export class Indentdown {
     return lines;
   }
 
+  /** 木構造からHTMLを得る */
   static getHtml(tree: Node[]): string {
     const lines = this.#getHtmlRecursive(tree);
     let unindent: number = 0;
