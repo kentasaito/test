@@ -80,7 +80,25 @@ export class Indentdown {
     const buffer = [];
     for (const line of lines) {
       const lastNodeType = nodeType;
-      nodeType = this.#getNodeType(line, lastNodeType, nodeType);
+//      nodeType = this.#getNodeType(line, lastNodeType, nodeType);
+
+      const numTags = this.#getNumTags(line);
+      this.htmlDepth += numTags.open - numTags.close;
+      if (line.match(/^ *$/)) {
+        if (lastNodeType === "text" as NodeType) {
+          nodeType = null;
+        }
+      } else if (nodeType !== "html" && line.match(/^ {2}/)) {
+        nodeType = "parent";
+      } else if (
+        nodeType !== "parent" && this.htmlDepth > 0 || numTags.open > 0 ||
+        numTags.close > 0
+      ) {
+        nodeType = "html";
+      } else {
+        nodeType = "text";
+      }
+
       this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
       console.log({ line });
       buffer.push(line);
