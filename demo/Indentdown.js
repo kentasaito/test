@@ -65,7 +65,6 @@ export class Indentdown {
   }
   static #flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType) {
     if (nodeType !== lastNodeType) {
-      console.log({ nodeType, buffer });
       if (lastNodeType !== null) {
         if (buffer.length > 0) {
           tree.push(
@@ -107,7 +106,6 @@ export class Indentdown {
         nodeType = "text";
       }
       this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType2, nodeType);
-      console.log({ line });
       buffer.push(line);
     }
     const lastNodeType = nodeType;
