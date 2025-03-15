@@ -11,8 +11,6 @@ type NumTags = {
 };
 
 export class Indentdown {
-  static htmlDepth: number = 0;
-
   static #getNumTags(line: string): NumTags {
     const value = line.replace(/[^<\/>]/g, "");
     return {
@@ -53,6 +51,7 @@ export class Indentdown {
   }
 
   static #getTreeRecursive(lines: string[]): Node[] {
+    let htmlDepth: number = 0;
     let nodeType: NodeType = null;
     const tree = [] as Node[];
     const buffer = [];
@@ -60,7 +59,7 @@ export class Indentdown {
       const lastNodeType = nodeType;
 
       const numTags = this.#getNumTags(line);
-      this.htmlDepth += numTags.open - numTags.close;
+      htmlDepth += numTags.open - numTags.close;
       if (line.match(/^ *$/)) {
         if (lastNodeType === "text" as NodeType) {
           nodeType = null;
@@ -68,7 +67,7 @@ export class Indentdown {
       } else if (nodeType !== "html" && line.match(/^ {2}/)) {
         nodeType = "parent";
       } else if (
-        nodeType !== "parent" && this.htmlDepth > 0 || numTags.open > 0 ||
+        nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 ||
         numTags.close > 0
       ) {
         nodeType = "html";
