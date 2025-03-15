@@ -1,4 +1,29 @@
-Indentdown
+import { Indentdown } from "./Indentdown.js";
+
+function render(input) {
+  const tree = Indentdown.getTree(input);
+  const html = Indentdown.getHtml(tree);
+  document.querySelector("#tree").value = JSON.stringify(tree, null, 2) + "\n";
+  document.querySelector("#html").value = html + "\n";
+  document.querySelector("#output").innerHTML = html + "\n";
+}
+
+function selectPane(type) {
+  document.getElementById("tree").style.display = type === "tree"
+    ? "block"
+    : "none";
+  document.getElementById("html").style.display = type === "html"
+    ? "block"
+    : "none";
+  document.getElementById("output").style.display = type === "output"
+    ? "block"
+    : "none";
+}
+
+globalThis.addEventListener("pageshow", () => {
+  const editor = ace.edit(document.querySelector("#input pre"));
+  editor.session.setTabSize(2);
+  editor.session.setValue(`Indentdown
   Indentdownは、Markdownのような軽量マークアップ言語です。
   テキストを木構造にする変換と、木構造をHTMLににする変換とで構成されます。
 
@@ -56,3 +81,16 @@ Indentdown
         値の各行のインデントの深さに1を加え、
         値の各行の末尾に&lt;/br&gt;を加え、
         &lt;p&gt;と&lt;/p&gt;とで囲む。
+`);
+
+  document.querySelector("#input").addEventListener("keyup", () => {
+    render(editor.getValue());
+  });
+
+  document.querySelector("#type").addEventListener("change", (e) => {
+    selectPane(e.target.value);
+  });
+
+  selectPane(document.querySelector("#type [name='type']:checked").value);
+  render(editor.getValue());
+});
