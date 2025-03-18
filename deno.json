@@ -3,7 +3,7 @@
     "@std/assert": "jsr:@std/assert@1"
   },
   "name": "@kenta/test",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "license": "MIT",
   "exports": "./src/Indentdown.ts",
   "deploy": {
