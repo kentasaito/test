@@ -78,7 +78,6 @@ const inlineElementCloseRegExp = new RegExp(
 
 /** Indentdownクラス */
 export class Indentdown {
-
   /** タグの個数を得る */
   static #getNumTags(line: string): NumTags {
     const value = line.replace(voidElementRegExp, "")
@@ -157,7 +156,9 @@ export class Indentdown {
 
   /** テキストから木構造を得る */
   static getTree(input: string): Node[] {
-    return this.#getTreeRecursive(input.replace(/#</g, "&lt;").replace(/#>/g, "&gt;").split("\n"));
+    return this.#getTreeRecursive(
+      input.replace(/#</g, "&lt;").replace(/#>/g, "&gt;").split("\n"),
+    );
   }
 
   /** 再帰的にHTMLを得る */
