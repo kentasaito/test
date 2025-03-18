@@ -12,7 +12,7 @@ const voidElements = [
   "param",
   "source",
   "track",
-  "wbr",
+  "wbr"
 ];
 const voidElementRegExp = new RegExp(`<(${voidElements.join("|")})[^>]*>`, "g");
 const inlineElements = [
@@ -45,51 +45,49 @@ const inlineElements = [
   "textarea",
   "time",
   "tt",
-  "var",
+  "var"
 ];
 const inlineElementOpenRegExp = new RegExp(
   `<(${inlineElements.join("|")})[^>]*>`,
-  "g",
+  "g"
 );
 const inlineElementCloseRegExp = new RegExp(
   `</(${inlineElements.join("|")})>`,
-  "g",
+  "g"
 );
 export class Indentdown {
+  /** タグの個数を得る */
   static #getNumTags(line) {
-    const value = line.replace(voidElementRegExp, "").replace(
-      inlineElementOpenRegExp,
-      "",
-    ).replace(inlineElementCloseRegExp, "").replace(/[^<\/>]/g, "");
+    const value = line.replace(voidElementRegExp, "").replace(inlineElementOpenRegExp, "").replace(inlineElementCloseRegExp, "").replace(/[^<\/>]/g, "");
     return {
       open: value.split("<>").length - 1,
-      close: value.split("</>").length - 1,
+      close: value.split("</>").length - 1
     };
   }
+  /** ノードタイプが変化したらノードをフラッシュする */
   static #flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType) {
     if (nodeType !== lastNodeType) {
       if (lastNodeType !== null) {
         if (buffer.length > 0) {
           tree.push(
-            lastNodeType === "parent"
-              ? {
-                nodeType: lastNodeType,
-                value: "",
-                children: this.#getTreeRecursive(
-                  buffer.map((line) => line.replace(/^ {2}/, "")),
-                ),
-              }
-              : {
-                nodeType: lastNodeType,
-                value: buffer.join("\n").trim(),
-                children: [],
-              },
+            lastNodeType === "parent" ? {
+              nodeType: lastNodeType,
+              value: "",
+              children: this.#getTreeRecursive(
+                buffer.map((line) => line.replace(/^ {2}/, ""))
+              )
+            } : {
+              nodeType: lastNodeType,
+              value: buffer.join("\n").trim(),
+              children: []
+            }
           );
         }
       }
       buffer.length = 0;
     }
   }
+  /** 再帰的に木構造を得る */
   static #getTreeRecursive(lines) {
     const tree = [];
     const buffer = [];
@@ -105,10 +103,7 @@ export class Indentdown {
         }
       } else if (nodeType !== "html" && line.match(/^ {2}/)) {
         nodeType = "parent";
-      } else if (
-        nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 ||
-        numTags.close > 0
-      ) {
+      } else if (nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 || numTags.close > 0) {
         nodeType = "html";
       } else {
         nodeType = "text";
@@ -121,9 +116,11 @@ export class Indentdown {
     this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
     return tree;
   }
+  /** テキストから木構造を得る */
   static getTree(input) {
     return this.#getTreeRecursive(input.split("\n"));
   }
+  /** 再帰的にHTMLを得る */
   static #getHtmlRecursive(tree, nodeDepth = 0) {
     const lines = [];
     for (const key in tree) {
@@ -133,8 +130,8 @@ export class Indentdown {
         lines.push("<div>");
         lines.push(
           ...this.#getHtmlRecursive(node.children, nodeDepth + 1).map(
-            (line) => "  " + line,
-          ),
+            (line) => "  " + line
+          )
         );
         lines.push("</div>");
       } else if (node.nodeType === "html") {
@@ -144,13 +141,14 @@ export class Indentdown {
       } else {
         lines.push("<p>");
         lines.push(
-          ...node.value.split("\n").map((line) => "  " + line + "<br>"),
+          ...node.value.split("\n").map((line) => "  " + line + "<br>")
         );
         lines.push("</p>");
       }
     }
     return lines;
   }
+  /** 木構造からHTMLを得る */
   static getHtml(tree) {
     const lines = this.#getHtmlRecursive(tree);
     let unindent = 0;
@@ -177,7 +175,6 @@ if (import.meta.main) {
     input += decoder.decode(chunk);
   }
   const tree = Indentdown.getTree(input);
-  console.log(JSON.stringify(tree, null, 2));
   const html = Indentdown.getHtml(tree);
   console.log(html);
 }

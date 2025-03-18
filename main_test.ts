@@ -77,3 +77,9 @@ Deno.test(function getTree6() {
     { nodeType: "text", value: "c", children: [] },
   ]);
 });
+
+Deno.test(function getTree7() {
+  assertEquals(Indentdown.getTree("#<hr#>"), [
+    { nodeType: "text", value: "&lt;hr&gt;", children: [] },
+  ]);
+});
