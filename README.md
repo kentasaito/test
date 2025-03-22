@@ -1,13 +1,16 @@
 # Indentdown
-It is a lightweight markup language. \
+
+It is a lightweight markup language.\
 It runs on browsers, runtimes, CLIs and Visual Studio Code.
 
-About "Indentdown live preview" for Visual Studio Code, see: \
+About "Indentdown live preview" for Visual Studio Code, see:\
 [Indentdown live preview for Visual Studio Code](#indentdown-live-preview-for-visual-studio-code)
 
 ## Examples
+
 ### Web browsers
-``` HTML
+
+```HTML
 <script type="module">
   import { Indentdown } from "./Indentdown.min.js";
   console.log(Indentdown.getHtml("Header\n  paragraph"));
@@ -15,19 +18,22 @@ About "Indentdown live preview" for Visual Studio Code, see: \
 ```
 
 ### Runtimes
-``` TypeScript
+
+```TypeScript
 import { Indentdown } from "jsr:@kenta/test";
 console.log(Indentdown.getHtml("Header\n  paragraph"));
 ```
 
 ### CLIs
-``` sh
+
+```sh
 $ mv indentdown.x86_64-unknown-linux-gnu indentdown
 $ chmod +x ./indentdown
 $ echo -e "Header\n  paragraph" | ./indentdown
 ```
 
 ## Links
+
 - Website: https://indentdown.deno.dev
   - Syntax: https://indentdown.deno.dev/syntax.html
   - Demo: https://indentdown.deno.dev/demo.html
@@ -40,7 +46,7 @@ $ echo -e "Header\n  paragraph" | ./indentdown
 
 Edit Indentdown files with live preview.
 
-To open the preview panel, while editing a file with the ".id" extension, click the Preview button in the top right corner of the editor or press Alt+I.
+To open the preview panel, while editing a file with the ".id" extension, click
+the Preview button in the top right corner of the editor or press Alt+I.
 
 ![open-preview-panel](https://indentdown.deno.dev/open-preview-panel.gif)
-

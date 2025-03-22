@@ -43,6 +43,6 @@
   "icon": "logo.png",
   "scripts": {
     "build": "deno -A jsr:@kt3k/pack@0.1.14 src/extension.ts -o out/extension.js --external vscode --format cjs",
-    "package": "vsce package"
+    "package": "deno -A --unstable-unsafe-proto npm:@vscode/vsce package"
   }
 }

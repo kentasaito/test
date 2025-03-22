@@ -12,7 +12,9 @@ app.get("/:htmlName{(index|demo|syntax|download)\\.html}", (c) => {
   return c.html(
     layout(
       Indentdown.getHtml(
-        Deno.readTextFileSync(`./site/id/${c.req.param("htmlName").replace(/\.html$/, ".id")}`),
+        Deno.readTextFileSync(
+          `./site/id/${c.req.param("htmlName").replace(/\.html$/, ".id")}`,
+        ),
       ),
     ),
   );
