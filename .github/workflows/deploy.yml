@@ -24,7 +24,7 @@ jobs:
           deno-version: v2.2.4
 
       - name: Build step
-        run: "npm install --save-exact --save-dev esbuild && deno task transpile && deno task compile && deno task build && deno task package"
+        run: "npm install --save-exact --save-dev esbuild && npm install vsce --save-dev && deno task transpile && deno task compile && deno task build && deno task package"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
