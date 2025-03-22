@@ -190,7 +190,7 @@ export class Indentdown {
   }
 
   /** Get HTML from text */
-  static getHtml(input: string) {
+  static getHtml(input: string): string {
     return this.#unindentPre(
       this.#unindentTextarea(
         this.#deleteRootNodeFromHtml(
