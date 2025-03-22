@@ -1,223 +1,206 @@
-/** ノードタイプ */
-type NodeType = null | "text" | "html" | "parent";
-
-/** ノード */
-type Node = {
-  nodeType: NodeType;
+// ノードクラス
+class IndentdownNode {
+  isHtmlBlock: boolean;
   value: string;
-  children: Node[];
-};
+  children: IndentdownNode[];
 
-/** タグの個数 */
-type NumTags = {
-  open: number;
-  close: number;
-};
-
-const voidElements = [
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr",
-];
-
-const voidElementRegExp = new RegExp(`<(${voidElements.join("|")})[^>]*>`, "g");
-
-const inlineElements = [
-  "a",
-  "abbr",
-  "acronym",
-  "b",
-  "bdo",
-  "big",
-  "button",
-  "cite",
-  "code",
-  "dfn",
-  "em",
-  "i",
-  "kbd",
-  "label",
-  "map",
-  "object",
-  "output",
-  "q",
-  "samp",
-  "script",
-  "select",
-  "small",
-  "span",
-  "strong",
-  "sub",
-  "sup",
-  "textarea",
-  "time",
-  "tt",
-  "var",
-];
-
-const inlineElementOpenRegExp = new RegExp(
-  `<(${inlineElements.join("|")})[^>]*>`,
-  "g",
-);
-
-const inlineElementCloseRegExp = new RegExp(
-  `</(${inlineElements.join("|")})>`,
-  "g",
-);
-
-/** Indentdownクラス */
-export class Indentdown {
-  /** タグの個数を得る */
-  static #getNumTags(line: string): NumTags {
-    const value = line.replace(voidElementRegExp, "")
-      .replace(inlineElementOpenRegExp, "")
-      .replace(inlineElementCloseRegExp, "")
-      .replace(/[^<\/>]/g, "");
-    return {
-      open: value.split("<>").length - 1,
-      close: value.split("</>").length - 1,
-    };
-  }
-
-  /** ノードタイプが変化したらノードをフラッシュする */
-  static #flushNodeIfNodeTypeChanged(
-    tree: Node[],
-    buffer: string[],
-    lastNodeType: NodeType,
-    nodeType: NodeType,
+  constructor(
+    isHtmlBlock: boolean = false,
+    value: string = "",
+    children: IndentdownNode[] = [],
   ) {
-    if (nodeType !== lastNodeType) {
-      if (lastNodeType !== null) {
-        if (buffer.length > 0) {
-          tree.push(
-            lastNodeType === "parent"
-              ? {
-                nodeType: lastNodeType,
-                value: "",
-                children: this.#getTreeRecursive(
-                  buffer.map((line) => line.replace(/^ {2}/, "")),
-                ),
-              }
-              : {
-                nodeType: lastNodeType,
-                value: buffer.join("\n").trim(),
-                children: [],
-              } as Node,
-          );
-        }
-      }
-      buffer.length = 0;
-    }
-  }
-
-  /** 再帰的に木構造を得る */
-  static #getTreeRecursive(lines: string[]): Node[] {
-    const tree = [] as Node[];
-    const buffer = [];
-    let htmlDepth: number = 0;
-    let nodeType: NodeType = null;
-    for (const line of lines) {
-      const lastNodeType: NodeType = nodeType;
-      const numTags = this.#getNumTags(line);
-      htmlDepth += numTags.open - numTags.close;
-      if (line.match(/^ *$/)) {
-        if (lastNodeType === "text") {
-          nodeType = null;
-        }
-      } else if (nodeType !== "html" && line.match(/^ {2}/)) {
-        nodeType = "parent";
-      } else if (
-        nodeType !== "parent" && htmlDepth > 0 || numTags.open > 0 ||
-        numTags.close > 0
-      ) {
-        nodeType = "html";
-      } else {
-        nodeType = "text";
-      }
-      this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
-      buffer.push(line);
-    }
-    const lastNodeType = nodeType;
-    nodeType = null;
-    this.#flushNodeIfNodeTypeChanged(tree, buffer, lastNodeType, nodeType);
-    return tree;
-  }
-
-  /** テキストから木構造を得る */
-  static getTree(input: string): Node[] {
-    return this.#getTreeRecursive(
-      input.replace(/#</g, "&lt;").replace(/#>/g, "&gt;").split("\n"),
-    );
-  }
-
-  /** 再帰的にHTMLを得る */
-  static #getHtmlRecursive(tree: Node[], nodeDepth: number = 0): string[] {
-    const lines: string[] = [];
-    for (const key in tree) {
-      const i = parseInt(key);
-      const node = tree[i];
-      if (node.nodeType === "parent") {
-        lines.push("<div>");
-        lines.push(
-          ...this.#getHtmlRecursive(node.children, nodeDepth + 1).map((line) =>
-            "  " + line
-          ),
-        );
-        lines.push("</div>");
-      } else if (node.nodeType === "html") {
-        lines.push(...node.value.split("\n"));
-      } else if (i < tree.length - 1 && tree[i + 1].nodeType === "parent") {
-        lines.push(`<h${nodeDepth + 1}>${node.value}</h${nodeDepth + 1}>`);
-      } else {
-        lines.push("<p>");
-        lines.push(
-          ...node.value.split("\n").map((line) => "  " + line + "<br>"),
-        );
-        lines.push("</p>");
-      }
-    }
-    return lines;
-  }
-
-  /** 木構造からHTMLを得る */
-  static getHtml(tree: Node[]): string {
-    const lines = this.#getHtmlRecursive(tree);
-    let unindent: number = 0;
-    for (const key in lines) {
-      const i = parseInt(key);
-      const matches = lines[i].match(/^((?: {2})*)<pre/);
-      if (matches) {
-        unindent = matches[1].length;
-      }
-      if (unindent > 0) {
-        lines[i] = lines[i].replace(new RegExp(`^ {0,${unindent + 2}}`), "");
-      }
-      if (lines[i].match(/<\/pre/)) {
-        unindent = 0;
-      }
-    }
-    return lines.join("\n");
+    this.isHtmlBlock = isHtmlBlock;
+    this.value = value;
+    this.children = children;
   }
 }
 
-if (import.meta.main) {
-  let input = "";
-  const decoder = new TextDecoder();
-  for await (const chunk of Deno.stdin.readable) {
-    input += decoder.decode(chunk);
+/** Indentdown class */
+export class Indentdown {
+  // インデント
+  static #indent = "  ";
+
+  // "#<"を"&lt;"に、"#>"を"&gt;"に変換
+  static #escapeTags(input: string) {
+    return input.replace(/#</g, "&lt;").replace(/#>/g, "&gt;");
   }
-  const tree = Indentdown.getTree(input);
-  const html = Indentdown.getHtml(tree);
-  console.log(html);
+
+  // インデントの深さを得る
+  static #getIndentDepth(line: string) {
+    return (line.match(new RegExp(`^((?:${this.#indent})*)`))?.[1].length ??
+      0) / this.#indent.length;
+  }
+
+  // HTMLブロックであるか
+  static #isHtmlBlock(line: string) {
+    return line.match(
+        /^ *<(address|article|aside|blockquote|canvas|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hr|li|main|nav|noscript|ol|p|pre|section|table|tfoot|ul|video|textarea)/,
+      )
+      ? true
+      : false;
+  }
+
+  // 閉じたHTMLであるか
+  static #isClosedHtml(value: string) {
+    value = value.replace(
+      /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)[^>]*>/g,
+      "",
+    );
+    value = value.replace(/[^<\/>]/g, "");
+    return value.split(/<>/).length - value.split(/<\/>/).length === 0;
+  }
+
+  // 行の配列から木構造を得る
+  static #getTreeFromLines(lines: string[], indentDepth: number = 0) {
+    // 行がなければ空の木構造を返す
+    if (lines.length === 0) {
+      return new IndentdownNode();
+    }
+    // 行の配列の先頭行をシフトで得る
+    const line = lines.shift() ?? "";
+    // ノードタイプを決定し、木構造を作る
+    const tree = new IndentdownNode(this.#isHtmlBlock(line));
+    // 木構造の値はインデントの深さだけアンインデントした行
+    tree.value = line.replace(
+      new RegExp(`(?:${this.#indent}){${indentDepth}}`),
+      "",
+    );
+    // 条件を満たす間
+    while (
+      lines.length > 0 &&
+      (
+        !tree.isHtmlBlock
+          ? this.#getIndentDepth(lines[0]) == indentDepth &&
+            !this.#isHtmlBlock(lines[0])
+          : !this.#isClosedHtml(tree.value)
+      )
+    ) {
+      // 続きの行を追加
+      const continuation = lines.shift() ?? "";
+      if (continuation !== "") {
+        tree.value += "\n" +
+          continuation.replace(
+            new RegExp(`(?:${this.#indent}){${indentDepth}}`),
+            "",
+          );
+      }
+    }
+    // 空行を飛ばす
+    while (lines[0] === "") {
+      lines.shift();
+    }
+    while (lines.length > 0 && this.#getIndentDepth(lines[0]) > indentDepth) {
+      const child = this.#getTreeFromLines(lines, indentDepth + 1);
+      if (child !== undefined) {
+        tree.children.push(child);
+      }
+    }
+    // 木構造を返す
+    return tree;
+  }
+
+  // テキストから木構造を得る
+  static #getTree(input: string) {
+    return this.#getTreeFromLines([
+      "ROOT",
+      ...input.trim().split("\n").map((line) =>
+        `${this.#indent}${line}`.replace(new RegExp(`^${this.#indent}$`), "")
+      ),
+    ]);
+  }
+
+  // 木構造からHTMLを得る
+  static #getHtmlFromTree(tree: IndentdownNode, indentDepth: number = 0) {
+    let html = "";
+    if (!tree.isHtmlBlock) {
+      if (tree.children.length > 0) {
+        html += `<h${indentDepth}>${tree.value}</h${indentDepth}>`;
+      } else {
+        html += `<p>\n${
+          tree.value.split("\n").map((line) => `${this.#indent}${line}<br>`)
+            .join("\n")
+        }\n</p>`;
+      }
+    } else {
+      html += tree.value;
+    }
+    if (tree.children.length > 0) {
+      html += "\n<div>";
+      html += "\n" +
+        tree.children.map((node) =>
+          this.#getHtmlFromTree(node, indentDepth + 1).split("\n").map((line) =>
+            `${this.#indent}${line}`
+          ).join("\n")
+        ).join("\n");
+      html += "\n</div>";
+    }
+    return html;
+  }
+
+  // HTMLから根ノードを削除する
+  static #deleteRootNodeFromHtml(html: string) {
+    const lines = html.split("\n");
+    lines.shift();
+    lines.shift();
+    lines.pop();
+    return lines.map((line) => line.replace(new RegExp(`^${this.#indent}`), ""))
+      .join("\n");
+  }
+
+  // <textarea>をアンインデントする
+  static #unindentTextarea(html: string) {
+    let depth = 0;
+    return html.split("\n").map((line) => {
+      if (line.match(new RegExp(`^(?:${this.#indent})*</textarea>$`))) {
+        line = line.replace(new RegExp(`^(${this.#indent}){${depth}}`), "");
+        depth = 0;
+      }
+      if (depth > 0) {
+        line = line.replace(new RegExp(`^(${this.#indent}){${depth + 1}}`), "");
+      }
+      const matches = line.match(
+        new RegExp(`^((?:${this.#indent})*)<textarea`),
+      );
+      if (matches) {
+        depth = matches[1].length / this.#indent.length;
+        line = line.replace(new RegExp(`^(${this.#indent}){${depth}}`), "");
+      }
+      return line;
+    }).join("\n");
+  }
+
+  // <pre>をアンインデントする
+  static #unindentPre(html: string) {
+    let depth = 0;
+    return html.split("\n").map((line) => {
+      if (line.match(new RegExp(`^(?:${this.#indent})*</pre>$`))) {
+        line = line.replace(new RegExp(`^(${this.#indent}){${depth}}`), "");
+        depth = 0;
+      }
+      if (depth > 0) {
+        line = line.replace(new RegExp(`^(${this.#indent}){${depth + 1}}`), "");
+      }
+      const matches = line.match(new RegExp(`^((?:${this.#indent})*)<pre`));
+      if (matches) {
+        depth = matches[1].length / this.#indent.length;
+        line = line.replace(new RegExp(`^(${this.#indent}){${depth}}`), "");
+      }
+      return line;
+    }).join("\n");
+  }
+
+  /** Get HTML from text */
+  static getHtml(input: string) {
+    return this.#unindentPre(
+      this.#unindentTextarea(
+        this.#deleteRootNodeFromHtml(
+          this.#getHtmlFromTree(
+            this.#getTree(
+              this.#escapeTags(input),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -1,4 +1,8 @@
 {
+  "lock": false,
+  "tasks": {
+    "transpile": "esbuild --minify-whitespace ./src/Indentdown.ts > ./dist/Indentdown.min.js"
+  },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
   },
