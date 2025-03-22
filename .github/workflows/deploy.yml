@@ -32,9 +32,3 @@ jobs:
           project: "kentasaito-test-70"
           entrypoint: "main.ts"
           root: "."
-          exclude:
-            - ./node_modules
-            - ./.github
-            - ./.vscode
-            - ./deno.json
-            - ./package.jso
