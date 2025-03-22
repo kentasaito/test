@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "transpile": "esbuild --minify-whitespace ./src/Indentdown.ts > ./dist/Indentdown.min.js",
+    "transpile": "mkdir -p ./dist && esbuild --minify-whitespace ./src/Indentdown.ts > ./dist/Indentdown.min.js",
     "compile": "(cd ./cli/ && ./compile.sh)",
     "serve": "deno run --allow-net --allow-read --watch ./main.ts",
     "deploy": "deployctl deploy --prod"
