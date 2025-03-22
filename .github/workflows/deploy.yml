@@ -32,7 +32,7 @@ jobs:
           project: "kentasaito-test-70"
           entrypoint: "main.ts"
           root: "."
-          exclude":
+          exclude:
             - ./node_modules
             - ./.github
             - ./.vscode
