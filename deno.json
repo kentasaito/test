@@ -20,17 +20,5 @@
       "README.md",
       "src/Indentdown.ts"
     ]
-  },
-  "deploy": {
-    "project": "e4899ef7-7151-4868-967b-b8d4a1866ab8",
-    "exclude": [
-      "./node_modules",
-      "./.github",
-      "./.vscode",
-      "./deno.json",
-      "./package.json"
-    ],
-    "include": [],
-    "entrypoint": "./main.ts"
   }
 }
