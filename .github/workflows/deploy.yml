@@ -24,10 +24,7 @@ jobs:
           deno-version: v2.2.4
 
       - name: Build step
-        run: "deno task transpile"
-        run: "deno task compile"
-        run: "deno task build"
-        run: "deno task package"
+        run: "deno task transpile && deno task compile && deno task build && deno task package"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
