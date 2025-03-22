@@ -29,6 +29,6 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "e4899ef7-7151-4868-967b-b8d4a1866ab8"
+          project: "kentasaito-test-70"
           entrypoint: "main.ts"
           root: "."
