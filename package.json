@@ -1,0 +1,48 @@
+{
+  "lock": false,
+  "contributes": {
+    "commands": [
+      {
+        "command": "indentdown.preview",
+        "title": "Preview",
+        "icon": "$(open-preview)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .id",
+          "command": "indentdown.preview",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "indentdown.preview",
+        "key": "alt+i"
+      }
+    ]
+  },
+  "name": "indentdown",
+  "version": "0.0.1",
+  "main": "./out/extension.js",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.98.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kentasaito/indentdown"
+  },
+  "displayName": "Indentdown live preview",
+  "description": "A lightweight markup language",
+  "publisher": "kenta-saito",
+  "icon": "logo.png",
+  "scripts": {
+    "build": "deno -A jsr:@kt3k/pack@0.1.14 src/extension.ts -o out/extension.js --external vscode --format cjs",
+    "package": "vsce package"
+  }
+}

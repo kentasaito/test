@@ -1,0 +1,36 @@
+ダウンロード
+  Visual Studio Code 拡張機能 - Indentdown live preview
+    Visual Studio Marketplaceからの頒布を準備中です。VSIXからインストールしてください。
+    <pre>
+      "拡張機能" #> "VSIX からのインストール"
+    </pre>
+    <a href="./indentdown-0.0.1.vsix">indentdown-0.0.1.vsix</a>
+
+  ブラウザ用JavaScript
+    <pre>
+      #<script type="module">
+        import { Indentdown } from "./Indentdown.min.js";
+        console.log(Indentdown.getHtml("Header\n  paragraph"));
+      #</script#>
+    </pre>
+    <a href="./dist/Indentdown.min.js">Indentdown.min.js</a>
+
+  ランタイム用TypeScript
+    通常は<a href="https://jsr.io/@kenta/test">JSR</a>からインポートしてください。
+    <pre>
+      import { Indentdown } from "jsr:@kenta/test";
+      console.log(Indentdown.getHtml("Header\n  paragraph"));
+    </pre>
+    <a href="./src/Indentdown.ts">Indentdown.ts</a>
+
+  コンパイル済みCLI用バイナリ
+    <pre>
+      $ mv indentdown.x86_64-unknown-linux-gnu indentdown
+      $ chmod +x ./indentdown
+      $ echo -e "Header\n  paragraph" | ./indentdown
+    </pre>
+    <a href="./cli/compiled/indentdown.x86_64-unknown-linux-gnu">indentdown.x86_64-unknown-linux-gnu</a>
+    <a href="./cli/compiled/indentdown.aarch64-unknown-linux-gnu">indentdown.aarch64-unknown-linux-gnu</a>
+    <a href="./cli/compiled/indentdown.x86_64-apple-darwin">indentdown.x86_64-apple-darwin</a>
+    <a href="./cli/compiled/indentdown.aarch64-apple-darwin">indentdown.aarch64-apple-darwin</a>
+    <a href="./cli/compiled/indentdown.x86_64-pc-windows-msvc.exe">indentdown.x86_64-pc-windows-msvc.exe</a>

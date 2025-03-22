@@ -1,0 +1,28 @@
+#container {
+  display: flex;
+  gap: 1rem;
+  > * {
+    flex: 1;
+  }
+}
+
+#input, #raw, #html {
+  margin: 0;
+  height: 16rem;
+  border: 1px solid hsl(0, 0%, 0%);
+}
+
+#raw, #html {
+  overflow: hidden;
+}
+
+#input {
+  width: 100%;
+  resize: none;
+}
+
+#html {
+  > * {
+    margin-top: 0;
+  }
+}

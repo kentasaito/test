@@ -1,0 +1,19 @@
+デモ
+  インデントは2個のスペースです。
+  <div id="container">
+    <div>
+      <div>Input</div>
+      <textarea id="input">
+        これはテストです。
+      </textarea>
+    </div>
+    <div>
+      <form id="form">
+        <input type="radio" name="mode" value="raw" checked>Raw
+        <input type="radio" name="mode" value="html">Rendered
+      </form>
+      <pre id="raw"></pre>
+      <div id="html" hidden></div>
+    </div>
+  </div>
+  <script type="module" src="./site/static/assets/demo.js"></script>

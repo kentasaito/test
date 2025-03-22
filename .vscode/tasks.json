@@ -1,0 +1,9 @@
+{
+  "tasks": [
+    {
+      "label": "build_ts",
+      "command": "deno",
+      "args": ["task", "build"]
+    }
+  ]
+}

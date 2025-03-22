@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  max-width: 720px;
+}
+
+a {
+  color: hsl(210, 50%, 40%);
+  text-decoration: none;
+}
+
+header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  a {
+    color: hsl(0, 0%, 0%);
+    text-decoration: none;
+  }
+}
+
+svg {
+  vertical-align: top;
+}
