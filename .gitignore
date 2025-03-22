@@ -1,2 +1,5 @@
+/cli/compiled/
+/dist/
 /node_modules/
 /out/
+/*.vsix
